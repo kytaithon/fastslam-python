@@ -1,1 +1,1 @@
-A python implementation of FastSLAM based on http://ais.informatik.uni-freiburg.de/teaching/ss19/robotics/
+A python implementation of FastSLAM based on [course's material](http://ais.informatik.uni-freiburg.de/teaching/ss19/robotics/)

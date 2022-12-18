@@ -29,7 +29,8 @@ class LandMark(object):
         self.mu = [0, 0]
         self.sigma = np.zeros([2, 2])
         self.observed = False
-        self.Q_t = np.array([[0.1, 0],\
+        #sensor noise
+        self.R = np.array([[0.1, 0],\
                     [0, 0.1]])
 
     def update(self, particle, real_meas):
@@ -48,7 +49,7 @@ class LandMark(object):
                 self.mu = [lx, ly]
                 h, H = self.measurement_model(particle)
                 H_inv = np.linalg.inv(H)
-                self.sigma = H_inv.dot(self.Q_t).dot(H_inv.T)
+                self.sigma = H_inv.dot(self.R).dot(H_inv.T)
 
                 self.observed = True
 
@@ -60,7 +61,7 @@ class LandMark(object):
             # calculate particle weight: particle['weight'] = ...
             h, H = self.measurement_model(particle)
             S = self.sigma
-            Q = H.dot(S).dot(H.T) + self.Q_t
+            Q = H.dot(S).dot(H.T) + self.R
             K = S.dot(H.T).dot(np.linalg.inv(Q))
            
             delta = np.array([meas_range - h[0], angle_diff(meas_bearing, h[1])])
@@ -120,7 +121,7 @@ def sample_motion_model(odometry, particles):
         #add motion model here
         #particle['x'] = ....
         particle.history.append([particle.x, particle.y])
-        particle.x = particle.x+ delta_hat_t*math.cos(particle.theta + delta_hat_r1)
+        particle.x = particle.x + delta_hat_t*math.cos(particle.theta + delta_hat_r1)
         particle.y = particle.y + delta_hat_t*math.sin(particle.theta + delta_hat_r1)
         particle.theta = particle.theta + delta_hat_r1 + delta_hat_r2
     return particles

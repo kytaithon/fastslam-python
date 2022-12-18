@@ -35,7 +35,8 @@ def error_ellipse(position, sigma):
 
     #generate covariance ellipse
     error_ellipse = Ellipse(xy=[position[0],position[1]], width=width, height=height, angle=angle/np.pi*180)
-    error_ellipse.set_alpha(0.25)
+    error_ellipse.set_alpha(0.5)
+    error_ellipse.set_facecolor(np.array([0.78327804, 0.87620279, 0.42349204, 0.04214362]))
 
     return error_ellipse
 
@@ -93,6 +94,7 @@ def plot_state(particles, landmarks):
     plt.clf()
 
     #particles
+
     plt.plot(xs, ys, 'r.')
     
     if draw_mean_landmark_poses:
