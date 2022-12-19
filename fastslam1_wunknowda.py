@@ -17,10 +17,10 @@ class Particle(object):
         self.history = []
 
         self.landmark_dict = {}
-        for i in range(num_landmarks):
-            landmark = LandMark()
+        # for i in range(num_landmarks):
+        #     landmark = LandMark()
             
-            self.landmark_dict[i+1] = landmark
+        #     self.landmark_dict[i+1] = landmark
         
 
 class LandMark(object):
@@ -135,22 +135,23 @@ def eval_sensor_model(sensor_data, particles):
     
 
     #measured landmark ids and ranges
-    ids = sensor_data['id']
+    #ids = sensor_data['id']  # ignore id information 
     ranges = sensor_data['range']
     bearings = sensor_data['bearing']
 
     #update landmarks and calculate weight for each particle
     for particle in particles:
-
-        landmarks = particle.landmark_dict
         particle.weight = 1.0
 
+        #landmarks = particle.landmark_dict
+      
         #loop over observed landmarks
-        for i in range(len(ids)):
+        for i in range(len(ranges)):
 
             #current landmark
-            lm_id = ids[i]
-            landmark = landmarks[lm_id]
+            #lm_id = ids[i] 
+
+            #landmark = landmarks[lm_id]
 
 
             #measured range and bearing to current landmark
@@ -158,8 +159,9 @@ def eval_sensor_model(sensor_data, particles):
             meas_bearing = bearings[i]
 
             real_meas = [meas_range, meas_bearing]
+            data_association(particle, real_meas)
 
-            landmark.update(particle, real_meas)
+            #landmark.update(particle, real_meas)
 
 
     #normalize weights
@@ -169,6 +171,34 @@ def eval_sensor_model(sensor_data, particles):
         particle.weight = particle.weight / normalizer
     return particles
 
+def data_association(particle, real_meas):
+    
+    range, bearing = real_meas
+   
+    if len(particle.landmark_dict) == 0:
+        #create first landmark
+        particle.landmark_dict[1] = LandMark()
+        particle.landmark_dict[1].update(particle, real_meas)
+    else:
+        landmarks = particle.landmark_dict
+        expect_lx = particle.x + range*math.cos(particle.theta + bearing)
+        expect_ly = particle.y + range*math.sin(particle.theta + bearing)
+        is_ass = False
+        for id in landmarks:
+            lx, ly = landmarks[id].mu
+            dist = np.sqrt((lx - expect_lx)**2 + (ly - expect_ly)**2)
+            print("distance",dist)
+            if dist < 1:
+                landmarks[id].update(particle, real_meas)
+                is_ass = True
+        
+        if not is_ass:
+            num_cur_lm = len(landmarks)
+            particle.landmark_dict[num_cur_lm+1] = LandMark()
+
+            particle.landmark_dict[num_cur_lm+1].update(particle, real_meas)
+
+    
 def resample_particles(particles):
     # Returns a new set of particles obtained by performing
     # stochastic universal sampling, according to the particle
@@ -202,7 +232,7 @@ def resample_particles(particles):
 
     return new_particles
 
-def data_association():
+
     
 if __name__ == "__main__":
     plt.axis([-1, 12, 0, 10])

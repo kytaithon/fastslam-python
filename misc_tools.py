@@ -61,8 +61,7 @@ def plot_state(particles, landmarks):
     for particle in particles:
         xs.append(particle.x)
         ys.append(particle.y)
-        
-        for i in range(len(landmarks)):
+        for i in range(len(particle.landmark_dict)):
             landmark = particle.landmark_dict[i+1]
             lxs.append(landmark.mu[0])
             lys.append(landmark.mu[1])
@@ -108,7 +107,7 @@ def plot_state(particles, landmarks):
     plt.plot(lx, ly, 'b+',markersize=10)
 
     # draw error ellipse of estimated landmark positions of best particle 
-    for i in range(len(landmarks)):
+    for i in range(len(particle.landmark_dict)):
         landmark = estimated.landmark_dict[i+1]
 
         ellipse = error_ellipse(landmark.mu, landmark.sigma)
